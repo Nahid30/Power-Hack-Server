@@ -13,17 +13,14 @@ app.use(express.json());
 
 const uri = "mongodb+srv://PowerHack2:nGkMIUOl3VBcGCW8@cluster0.4l6ze.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-// client.connect(err => {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   console.log('db connected mamu')
-//   client.close();
-// });
 
 async function run() {
     try {
         await client.connect();
         const billCollection = client.db("powerHack").collection("bill");
+
+
+        app.get('/signup')
         
         // GET 
         app.get('/bill', async(req, res) => {
