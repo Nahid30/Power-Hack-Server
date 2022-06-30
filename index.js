@@ -32,6 +32,15 @@ async function run() {
             const bills = await cursor.toArray();
             res.send(bills);
         });
+
+          //POST
+
+          app.post('/bill', async (req, res) => {
+            const addNewBill = req.body;
+            const result = await billCollection.insertOne(addNewBill);
+            res.send(result);
+        }) 
+
     }
     finally {
         // await client.close();
