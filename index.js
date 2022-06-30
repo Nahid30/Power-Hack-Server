@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const cors = require('cors');
 require('dotenv').config()
@@ -25,7 +25,8 @@ async function run() {
     try {
         await client.connect();
         const billCollection = client.db("powerHack").collection("bill");
-
+        
+        // GET 
         app.get('/bill', async(req, res) => {
             const query = {};
             const cursor = billCollection.find(query);
@@ -33,13 +34,21 @@ async function run() {
             res.send(bills);
         });
 
-          //POST
-
-          app.post('/bill', async (req, res) => {
+        //POST
+        app.post('/bill', async (req, res) => {
             const addNewBill = req.body;
             const result = await billCollection.insertOne(addNewBill);
             res.send(result);
         }) 
+
+        //DELETE
+        app.delete('/bill/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await billCollection.deleteOne(query);
+            res.send(result);
+
+        })
 
     }
     finally {
