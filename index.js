@@ -11,7 +11,6 @@ app.use(express.json());
 
 
 
-
 const uri = "mongodb+srv://PowerHack2:nGkMIUOl3VBcGCW8@cluster0.4l6ze.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 // client.connect(err => {
@@ -28,9 +27,22 @@ async function run() {
         
         // GET 
         app.get('/bill', async(req, res) => {
+            // const query = {};
+            // const cursor = billCollection.find(query);
+            // const bills = await cursor.toArray();
+            // res.send(bills);
+
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
             const query = {};
             const cursor = billCollection.find(query);
-            const bills = await cursor.toArray();
+            let bills;
+            if(page || size){
+                bills = await cursor.skip(page*size).limit(size).toArray();
+            }
+            else{
+                bills = await cursor.toArray();
+            }
             res.send(bills);
         });
 
@@ -50,6 +62,31 @@ async function run() {
 
         })
 
+
+        
+
+        // PATCH 
+        app.patch('/bill/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateBill = req.body;
+            const filter = { id: id };
+            const updateDoc = {
+                $set: updateBill,
+            };
+            const result = await billCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+
+        app.get('/billCount', async(req,res)=>{
+           
+            const count = await billCollection.estimatedDocumentCount();
+           
+            res.send({count})
+        })
+
+
+
     }
     finally {
         // await client.close();
@@ -57,14 +94,6 @@ async function run() {
 
 }
 run().catch(console.dir);
-
-
-
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.p0sri.mongodb.net/?retryWrites=true&w=majority`;
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
-
-
 
 
 
